@@ -15,3 +15,5 @@ Start by running `npm install` inside the project folder
 ## Deployed application
 
 https://fullstack-hy-cicd.fly.dev/
+
+This update is used to test the `#skip` release behavior.
