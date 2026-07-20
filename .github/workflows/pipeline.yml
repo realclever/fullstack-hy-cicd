@@ -29,9 +29,6 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Failure test
-        run: exit 1
-
       - name: Check style
         run: npm run eslint
 
