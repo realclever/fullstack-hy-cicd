@@ -13,4 +13,4 @@ jobs:
       - name: Check deployed application
         uses: jtalk/url-health-check-action@v5
         with:
-          url: https://fullstack-hy-cicd.fly.dev/health
+          url: https://fullstack-hy-cicd.fly.dev/cat
