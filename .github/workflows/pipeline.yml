@@ -74,8 +74,7 @@ jobs:
         with:
           webhook: ${{ secrets.DISCORD_WEBHOOK }}
           status: success
-          title: Yay, it worked!
-          description: Somehow, it worked.
+          title: Somehow, it worked.
           color: 0x00ff00
 
   notify_failure:
@@ -92,7 +91,6 @@ jobs:
           webhook: ${{ secrets.DISCORD_WEBHOOK }}
           status: failure
           title: As expected, the build failed.
-          description: Of course something is broken.
           color: 0xff0000
 
   tag_release:
