@@ -16,7 +16,7 @@ permissions:
   contents: write
 
 jobs:
-  simple_deployment_pipeline:
+  build_and_test:
     runs-on: ubuntu-latest
 
     steps:
@@ -44,29 +44,32 @@ jobs:
       - name: Run e2e tests
         run: npm run test:e2e
 
+  deploy:
+    needs:
+      - build_and_test
+    if: ${{ github.event_name == 'push' && !contains(join(github.event.commits.*.message, ' '), '#skip') }}
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v6
+
       - name: Setup Flyctl
         uses: superfly/flyctl-actions/setup-flyctl@master
         with:
           version: 0.4.71
 
       - name: Deploy to Fly.io
-        if: ${{ github.event_name == 'push' && !contains(join(github.event.commits.*.message, ' '), '#skip') }}
         run: flyctl deploy --remote-only
         env:
           FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
 
-      - name: Notify Discord on failure
-        if: ${{ failure() }}
-        uses: sarisia/actions-status-discord@v1
-        with:
-          webhook: ${{ secrets.DISCORD_WEBHOOK }}
-          status: failure
-          title: MF***... the build failed
-          description: Of course something is broken.
-          color: 0xff0000
+  notify_success:
+    needs:
+      - deploy
+    runs-on: ubuntu-latest
 
+    steps:
       - name: Notify Discord on successful deployment
-        if: ${{ success() && github.event_name == 'push' && !contains(join(github.event.commits.*.message, ' '), '#skip') }}
         uses: sarisia/actions-status-discord@v1
         with:
           webhook: ${{ secrets.DISCORD_WEBHOOK }}
@@ -75,10 +78,26 @@ jobs:
           description: Somehow, it worked.
           color: 0x00ff00
 
+  notify_failure:
+    needs:
+      - build_and_test
+      - deploy
+    if: ${{ always() && (needs.build_and_test.result == 'failure' || needs.deploy.result == 'failure') }}
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Notify Discord on failure
+        uses: sarisia/actions-status-discord@v1
+        with:
+          webhook: ${{ secrets.DISCORD_WEBHOOK }}
+          status: failure
+          title: As expected, the build failed.
+          description: Of course something is broken.
+          color: 0xff0000
+
   tag_release:
     needs:
-      - simple_deployment_pipeline
-    if: ${{ github.event_name == 'push' && !contains(join(github.event.commits.*.message, ' '), '#skip') }}
+      - deploy
     runs-on: ubuntu-latest
 
     steps:
