@@ -12,8 +12,8 @@ Start by running `npm install` inside the project folder
 `npm run build` to make a production build
 `npm run start-prod` to run your production build
 
-## Deployed application
+## Links
 
-https://fullstack-hy-cicd.fly.dev/
+Pokédex: https://fullstack-hy-cicd.fly.dev/
 
-This update is used to test the `#skip` release behavior.
+Exercises 21–22 repository: https://github.com/realclever/fullstack-hy-cicd-flight-diaries
